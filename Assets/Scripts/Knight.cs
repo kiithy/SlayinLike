@@ -126,7 +126,7 @@ public class gameplay : MonoBehaviour
         {
             Debug.Log("OnGround");
             onGroundState = true;
-            knightAnimator.SetBool("onGroundState", onGroundState);
+            knightAnimator.SetBool("OnGroundState", onGroundState);
         }
     }
 }
