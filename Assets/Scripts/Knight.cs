@@ -20,6 +20,8 @@ public class gameplay : MonoBehaviour
     private bool onGroundState = true;
     private bool alive = true;
     private bool moving = true;
+    private bool damaged = false;
+    private bool invincible = false;
 
     private void Awake()
     {
@@ -128,5 +130,27 @@ public class gameplay : MonoBehaviour
             onGroundState = true;
             knightAnimator.SetBool("OnGroundState", onGroundState);
         }
+
+    }
+
+    void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.gameObject.CompareTag("Enemy") && !invincible)
+        {
+            // SECTION - Knight is damaged
+            invincible = true;
+            Debug.Log("Knight is damaged");
+            damaged = true;
+            knightAnimator.SetBool("damaged", damaged);
+            StartCoroutine(Damaged());
+        }
+    }
+
+    IEnumerator Damaged()
+    {
+        yield return new WaitForSeconds(2);
+        damaged = false;
+        knightAnimator.SetBool("damaged", damaged);
+        invincible = false;
     }
 }
