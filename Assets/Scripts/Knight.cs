@@ -20,9 +20,12 @@ public class gameplay : MonoBehaviour
     private bool jumpedState = false;
     private bool onGroundState = true;
     private bool alive = true;
-    private bool moving = true;
+    private bool moving = false;
     private bool damaged = false;
     private bool invincible = false;
+    private int attackCombo = 0;
+    private float comboTimer = 0;
+    private float comboTimeWindow = 0.5f;
 
     private void Awake()
     {
@@ -61,16 +64,17 @@ public class gameplay : MonoBehaviour
         if (value == 0)
         {
             moving = false;
+            knightAnimator.SetBool("Moving", moving);
             knightBody.velocity = new Vector2(0, knightBody.velocity.y);
         }
         else{
             FlipKnightSprite(value);
             moving = true;
+            knightAnimator.SetBool("Moving", moving);
             Move(value);
         }
 
     }
-
     public void Jump()
     {
         if (alive && onGroundState)
@@ -95,6 +99,39 @@ public class gameplay : MonoBehaviour
         }
     }
 
+    public void Attack()
+    {
+        if (alive)
+        {
+            if (comboTimer > 0 && attackCombo == 1)
+            {
+                attackCombo = 2;
+            }
+            else
+            {
+                attackCombo = 1;
+            }
+
+            knightAnimator.SetInteger("AttackType", attackCombo);
+            knightAnimator.SetTrigger("Attack");
+
+            comboTimer = comboTimeWindow; // Reset combo timer
+        }
+    }
+
+    private void UpdateComboTimer()
+    {
+        if (comboTimer > 0)
+        {
+            comboTimer -= Time.deltaTime;
+        }
+        else
+        {
+            attackCombo = 0;
+            knightAnimator.SetInteger("AttackType", attackCombo);
+        }
+    }
+
     private void OnJumpHold(InputAction.CallbackContext context)
     {
         isJumpHolding = context.ReadValueAsButton();
@@ -113,6 +150,7 @@ public class gameplay : MonoBehaviour
     void Update()
     {
         knightAnimator.SetFloat("xSpeed", Mathf.Abs(knightBody.velocity.x));
+        UpdateComboTimer();
     }
 
 

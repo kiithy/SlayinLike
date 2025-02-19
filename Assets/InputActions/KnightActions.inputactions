@@ -31,6 +31,15 @@
                     "processors": "",
                     "interactions": "Hold",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "attack1",
+                    "type": "Button",
+                    "id": "3894790e-7d38-41e1-b139-111989a2aeb5",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -86,6 +95,17 @@
                     "processors": "",
                     "groups": ";Keyboard",
                     "action": "jumphold",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1062ac09-760d-47bb-afa7-a3f22259935b",
+                    "path": "<Keyboard>/j",
+                    "interactions": "Press,MultiTap",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "attack1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

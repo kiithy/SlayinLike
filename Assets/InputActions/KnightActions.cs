@@ -53,6 +53,15 @@ public partial class @KnightActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": ""Hold"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""attack1"",
+                    ""type"": ""Button"",
+                    ""id"": ""3894790e-7d38-41e1-b139-111989a2aeb5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -110,6 +119,17 @@ public partial class @KnightActions: IInputActionCollection2, IDisposable
                     ""action"": ""jumphold"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1062ac09-760d-47bb-afa7-a3f22259935b"",
+                    ""path"": ""<Keyboard>/j"",
+                    ""interactions"": ""Press,MultiTap"",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""attack1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -133,6 +153,7 @@ public partial class @KnightActions: IInputActionCollection2, IDisposable
         m_gameplay_move = m_gameplay.FindAction("move", throwIfNotFound: true);
         m_gameplay_jump = m_gameplay.FindAction("jump", throwIfNotFound: true);
         m_gameplay_jumphold = m_gameplay.FindAction("jumphold", throwIfNotFound: true);
+        m_gameplay_attack1 = m_gameplay.FindAction("attack1", throwIfNotFound: true);
     }
 
     ~@KnightActions()
@@ -202,6 +223,7 @@ public partial class @KnightActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_gameplay_move;
     private readonly InputAction m_gameplay_jump;
     private readonly InputAction m_gameplay_jumphold;
+    private readonly InputAction m_gameplay_attack1;
     public struct GameplayActions
     {
         private @KnightActions m_Wrapper;
@@ -209,6 +231,7 @@ public partial class @KnightActions: IInputActionCollection2, IDisposable
         public InputAction @move => m_Wrapper.m_gameplay_move;
         public InputAction @jump => m_Wrapper.m_gameplay_jump;
         public InputAction @jumphold => m_Wrapper.m_gameplay_jumphold;
+        public InputAction @attack1 => m_Wrapper.m_gameplay_attack1;
         public InputActionMap Get() { return m_Wrapper.m_gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -227,6 +250,9 @@ public partial class @KnightActions: IInputActionCollection2, IDisposable
             @jumphold.started += instance.OnJumphold;
             @jumphold.performed += instance.OnJumphold;
             @jumphold.canceled += instance.OnJumphold;
+            @attack1.started += instance.OnAttack1;
+            @attack1.performed += instance.OnAttack1;
+            @attack1.canceled += instance.OnAttack1;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -240,6 +266,9 @@ public partial class @KnightActions: IInputActionCollection2, IDisposable
             @jumphold.started -= instance.OnJumphold;
             @jumphold.performed -= instance.OnJumphold;
             @jumphold.canceled -= instance.OnJumphold;
+            @attack1.started -= instance.OnAttack1;
+            @attack1.performed -= instance.OnAttack1;
+            @attack1.canceled -= instance.OnAttack1;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -271,5 +300,6 @@ public partial class @KnightActions: IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnJumphold(InputAction.CallbackContext context);
+        void OnAttack1(InputAction.CallbackContext context);
     }
 }
