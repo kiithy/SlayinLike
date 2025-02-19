@@ -14,6 +14,7 @@ public class gameplay : MonoBehaviour
     public float maxSpeed = 10;
     public float speed = 5;
     public float upSpeed = 4;
+    public float doubleJumpSpeed;
     private bool faceRightState = true;
     public Animator knightAnimator;
     private bool jumpedState = false;
@@ -89,7 +90,7 @@ public class gameplay : MonoBehaviour
         if (alive && jumpedState)
         {
             // jump higher
-            knightBody.AddForce(Vector2.up * upSpeed * 10, ForceMode2D.Force);
+            knightBody.AddForce(Vector2.up * upSpeed * (doubleJumpSpeed * 10), ForceMode2D.Force);
             jumpedState = false;
         }
     }
