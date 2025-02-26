@@ -30,6 +30,11 @@ public class gameplay : MonoBehaviour
     private Collider2D swordCollider;
     private CapsuleCollider2D knightCollider;
 
+    public AudioSource knightAudioSource;
+    public AudioClip knightAttack1Sound;
+    public AudioClip knightAttack2Sound;
+    public AudioClip knightDeathSound;
+
     private void Awake()
     {
         controls = new KnightActions();
@@ -216,4 +221,17 @@ public class gameplay : MonoBehaviour
     //     yield return new WaitForSeconds(0.2f);
     //     swordCollider.enabled = false;
     // }
+
+    public void PlayAttack1Sound()
+    {
+        knightAudioSource.PlayOneShot(knightAttack1Sound);
+    }
+
+    public void PlayAttack2Sound()
+    {
+        knightAudioSource.PlayOneShot(knightAttack2Sound);
+    }
+
+
+
 }

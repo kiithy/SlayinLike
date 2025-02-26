@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 452631354579545964}
   - component: {fileID: 5057727709755986851}
+  - component: {fileID: 355058975677370284}
   m_Layer: 3
   m_Name: SwordHitBox
   m_TagString: Untagged
@@ -44,7 +45,7 @@ BoxCollider2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -77,6 +78,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.14643899, y: 0.16784918}
   m_EdgeRadius: 0
+--- !u!114 &355058975677370284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3836389346506792143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29ad8ea11a96b44e78007a31245c23ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &5473574166441149399
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -241,10 +254,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxSpeed: 10
   speed: 1.5
-  upSpeed: 3
+  upSpeed: 5
   doubleJumpSpeed: 4
   knightAnimator: {fileID: 8066088004368177522}
+  invincible: 0
   swordHitbox: {fileID: 3836389346506792143}
+  knightAudioSource: {fileID: 1866930790220324129}
+  knightAttack1Sound: {fileID: 8300000, guid: a5f96954924254b9493c26c4bbf81b24, type: 3}
+  knightAttack2Sound: {fileID: 8300000, guid: 0eee4bfcacdfe405d9f8c5d360b274f6, type: 3}
+  knightDeathSound: {fileID: 0}
 --- !u!114 &1658041706952234440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -514,7 +532,7 @@ AudioSource:
   m_GameObject: {fileID: 3120561214917514431}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -258305918732751606, guid: 0b066b7948bbc44c180a163aa9067530, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
