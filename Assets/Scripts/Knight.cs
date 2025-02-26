@@ -26,7 +26,7 @@ public class gameplay : MonoBehaviour
     public int attackCombo = 0;
     private float comboTimer = 0;
     private float comboTimeWindow = 0.5f;
-    public int health = 5;
+    private int health;
     public GameObject swordHitbox;
     private Collider2D swordCollider;
     private CapsuleCollider2D knightCollider;
@@ -177,6 +177,7 @@ public class gameplay : MonoBehaviour
         knightSprite = GetComponent<SpriteRenderer>();
         knightAnimator.SetBool("OnGroundState", onGroundState);
         knightCollider = GetComponent<CapsuleCollider2D>();
+        health = GameManager.Instance.maxPlayerHealth;
     }
 
     // Update is called once per frame
@@ -240,6 +241,7 @@ public class gameplay : MonoBehaviour
         if (health <= 0)
         {
             GameManager.Instance.GameOver();
+            return;
         }
     }
 }

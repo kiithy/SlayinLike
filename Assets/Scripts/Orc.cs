@@ -25,7 +25,8 @@ public class Orc : MonoBehaviour
     private bool playerInRange = false;
 
     public GameManager gameManager;
-    private int health = 10;
+    public int health = 10;
+    public GameObject statue;
 
     private void Start()
     {
@@ -141,6 +142,18 @@ public class Orc : MonoBehaviour
             PlayDeathSound();
             animator.SetTrigger("Kill");
             StartCoroutine(DestroyOrcBody());
+            // SECTION - Spawn statue here to go to next level
+            // Get the statue's rigidbody and make it dynamic
+            if (statue != null)
+            {
+                Rigidbody2D statueRb = statue.GetComponent<Rigidbody2D>();
+                if (statueRb != null)
+                {
+                    statueRb.bodyType = RigidbodyType2D.Dynamic;
+                    // Make the statue very heavy when it falls
+                    statueRb.mass = 100f;
+                }
+            }
         }
         else
         {

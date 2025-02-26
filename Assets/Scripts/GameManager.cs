@@ -7,6 +7,9 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }  // Singleton pattern
 
+    [Header("Player Stats")]
+    public int maxPlayerHealth = 3;  // Set this in inspector
+
     // events
     public UnityEvent gameStart;
     public UnityEvent gameRestart;
@@ -32,7 +35,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        health = 5;  // Set initial health directly
+        health = maxPlayerHealth;  // Use the configurable value
         SetHealth(health);
         gameStart.Invoke();
         Time.timeScale = 1.0f;
@@ -40,12 +43,15 @@ public class GameManager : MonoBehaviour
 
     public void DecreaseHealth(int decrement)
     {
+        if (health - decrement <= 0)
+        {
+            health = 0;
+            SetHealth(health);
+            GameOver();
+            return;
+        }
         health -= decrement;
         SetHealth(health);
-        if (health <= 0)
-        {
-            GameOver();
-        }
     }
 
     // Update is called once per frame
@@ -56,10 +62,9 @@ public class GameManager : MonoBehaviour
 
     public void GameRestart()
     {
-        // reset score and health
         score = 0;
         SetScore(score);
-        health = 5;  // Reset health
+        health = maxPlayerHealth;  // Use the same configurable value
         SetHealth(health);
         gameRestart.Invoke();
         Time.timeScale = 1.0f;
