@@ -96,6 +96,7 @@ public class Orc : MonoBehaviour
         rb.velocity = Vector2.zero; // Stop moving
         animator.SetBool("IsWalking", false);
         animator.SetBool("IsAttacking", true);
+        animator.SetBool("IsWalking", true); // set it back to true just to trigger the walking animation back
     }
 
     // Called by Animation Event at the end of attack animation
