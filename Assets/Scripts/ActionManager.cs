@@ -9,6 +9,7 @@ public class ActionManager : MonoBehaviour
     public UnityEvent jumpHold;
     public UnityEvent<int> moveCheck;
     public UnityEvent attack;
+    public UnityEvent test;
 
     public void OnJumpHoldAction(InputAction.CallbackContext context)
     {

@@ -26,10 +26,16 @@ public class gameplay : MonoBehaviour
     private int attackCombo = 0;
     private float comboTimer = 0;
     private float comboTimeWindow = 0.5f;
+    public GameObject swordHitbox;
+    private Collider2D swordCollider;
+    private CapsuleCollider2D knightCollider;
 
     private void Awake()
     {
         controls = new KnightActions();
+        swordCollider = swordHitbox.GetComponent<Collider2D>();
+        swordCollider.enabled = false;
+        knightCollider = GetComponent<CapsuleCollider2D>();
     }
 
 
@@ -45,17 +51,21 @@ public class gameplay : MonoBehaviour
         {
             faceRightState = false;
             knightSprite.flipX = true;
+            // Position sword hitbox on left side
+            Vector3 localOffset = new Vector3(0, 0f, 0);
+            swordHitbox.transform.localPosition = localOffset;
+            swordHitbox.transform.localScale = new Vector3(-1, 1, 1);
             Debug.Log("Flip to left");
-            // if (knightBody.velocity.x > 0.05f)
-            //     knightAnimator.SetTrigger("onSkid");
-
-        } else if (value == 1 && !faceRightState)
+        }
+        else if (value == 1 && !faceRightState)
         {
             faceRightState = true;
             knightSprite.flipX = false;
+            // Position sword hitbox on right side
+            Vector3 localOffset = new Vector3(0, 0f, 0);
+            swordHitbox.transform.localPosition = localOffset;
+            swordHitbox.transform.localScale = new Vector3(1, 1, 1);
             Debug.Log("Flip to right");
-            // if (knightBody.velocity.x > 0.05f)
-            //     knightAnimator.SetTrigger("onSkid");
         }
     }
 
@@ -67,7 +77,8 @@ public class gameplay : MonoBehaviour
             knightAnimator.SetBool("Moving", moving);
             knightBody.velocity = new Vector2(0, knightBody.velocity.y);
         }
-        else{
+        else
+        {
             FlipKnightSprite(value);
             moving = true;
             knightAnimator.SetBool("Moving", moving);
@@ -112,11 +123,26 @@ public class gameplay : MonoBehaviour
                 attackCombo = 1;
             }
 
+            // // Test direct activation
+            // activateHitBox();
+
             knightAnimator.SetInteger("AttackType", attackCombo);
             knightAnimator.SetTrigger("Attack");
 
             comboTimer = comboTimeWindow; // Reset combo timer
         }
+    }
+
+    public void activateHitBox()
+    {
+        swordCollider.enabled = true;
+        Debug.Log("Hitbox activated");
+    }
+
+    public void deactivateHitBox()
+    {
+        swordCollider.enabled = false;
+        Debug.Log("Hitbox deactivated");
     }
 
     private void UpdateComboTimer()
@@ -144,6 +170,7 @@ public class gameplay : MonoBehaviour
 
         knightSprite = GetComponent<SpriteRenderer>();
         knightAnimator.SetBool("OnGroundState", onGroundState);
+        knightCollider = GetComponent<CapsuleCollider2D>();
     }
 
     // Update is called once per frame
@@ -180,7 +207,7 @@ public class gameplay : MonoBehaviour
             invincible = true;
             Debug.Log("Knight is damaged");
             damaged = true;
-            knightAnimator.SetBool("damaged", damaged);
+            knightAnimator.SetBool("Damaged", damaged);
             StartCoroutine(Damaged());
         }
     }
@@ -189,7 +216,14 @@ public class gameplay : MonoBehaviour
     {
         yield return new WaitForSeconds(2);
         damaged = false;
-        knightAnimator.SetBool("damaged", damaged);
+        knightAnimator.SetBool("Damaged", damaged);
         invincible = false;
     }
+
+    // IEnumerator ActivateSwordHitbox()
+    // {
+    //     swordCollider.enabled = true;
+    //     yield return new WaitForSeconds(0.2f);
+    //     swordCollider.enabled = false;
+    // }
 }

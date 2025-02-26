@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Orc : MonoBehaviour
 {
@@ -12,6 +13,14 @@ public class Orc : MonoBehaviour
     [SerializeField] private float attackRange = 2f;
     private bool isAttacking = false;
 
+    private bool isDamaged = false;
+
+    private CapsuleCollider2D orcCollider;
+
+    private void Awake()
+    {
+        orcCollider = GetComponent<CapsuleCollider2D>();
+    }
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -32,6 +41,9 @@ public class Orc : MonoBehaviour
             Debug.LogWarning("No player reference!");
             return;
         }
+
+        // Don't process attack/movement logic if damaged
+        if (isDamaged) return;
 
         // Calculate distance to player
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
@@ -86,5 +98,23 @@ public class Orc : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        Debug.Log($"Orc took {damage} damage!");
+        isDamaged = true;
+        isAttacking = false;  // Stop any current attack
+        animator.SetBool("IsAttacking", false);  // Reset attack animation
+        animator.SetBool("IsWalking", false);    // Stop walking animation
+        animator.SetTrigger("Damaged");
+
+    }
+
+    public void ResetAfterDamage()
+    {
+        isDamaged = false;
+        animator.SetBool("IsWalking", true);
+        // Attacks will happen naturally again
     }
 }
