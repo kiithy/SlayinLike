@@ -43,7 +43,15 @@ public class Orc : MonoBehaviour
         }
 
         // Don't process attack/movement logic if damaged
-        if (isDamaged) return;
+        if (isDamaged)
+        {
+            // Stop any current movement and attack
+            rb.velocity = Vector2.zero;
+            isAttacking = false;
+            animator.SetBool("IsAttacking", false);
+            animator.SetBool("IsWalking", false);
+            return;
+        }
 
         // Calculate distance to player
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
@@ -104,17 +112,25 @@ public class Orc : MonoBehaviour
     {
         Debug.Log($"Orc took {damage} damage!");
         isDamaged = true;
-        isAttacking = false;  // Stop any current attack
-        animator.SetBool("IsAttacking", false);  // Reset attack animation
-        animator.SetBool("IsWalking", false);    // Stop walking animation
-        animator.SetTrigger("Damaged");
+        isAttacking = false;
+        animator.SetBool("IsAttacking", false);
+        animator.SetBool("IsWalking", false);
 
+        // Set the hurt animation to play for 2 seconds
+        StartCoroutine(PlayHurtAnimation());
     }
 
+    private IEnumerator PlayHurtAnimation()
+    {
+        animator.SetTrigger("Damaged");
+        yield return new WaitForSeconds(2f);
+        ResetAfterDamage();
+    }
+
+    // Now called by coroutine instead of animation event
     public void ResetAfterDamage()
     {
         isDamaged = false;
         animator.SetBool("IsWalking", true);
-        // Attacks will happen naturally again
     }
 }
