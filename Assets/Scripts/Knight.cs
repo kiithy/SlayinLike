@@ -23,7 +23,7 @@ public class gameplay : MonoBehaviour
     private bool moving = false;
     private bool damaged = false;
     public bool invincible = false;
-    private int attackCombo = 0;
+    public int attackCombo = 0;
     private float comboTimer = 0;
     private float comboTimeWindow = 0.5f;
     public GameObject swordHitbox;

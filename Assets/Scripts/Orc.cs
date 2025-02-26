@@ -122,15 +122,18 @@ public class Orc : MonoBehaviour
         animator.SetBool("IsWalking", false);
 
         // Set the hurt animation to play for 2 seconds
-        StartCoroutine(PlayHurtAnimation());
-    }
+        // StartCoroutine(PlayHurtAnimation());
 
-    private IEnumerator PlayHurtAnimation()
-    {
         animator.SetTrigger("Damaged");
-        yield return new WaitForSeconds(2f);
         ResetAfterDamage();
     }
+
+    // private IEnumerator PlayHurtAnimation()
+    // {
+    //     animator.SetTrigger("Damaged");
+    //     yield return new WaitForSeconds(2f);
+    //     ResetAfterDamage();
+    // }
 
     // Now called by coroutine instead of animation event
     public void ResetAfterDamage()

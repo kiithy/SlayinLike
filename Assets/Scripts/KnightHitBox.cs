@@ -2,12 +2,23 @@ using UnityEngine;
 
 public class KnightHitBox : MonoBehaviour
 {
+    private int attackCombo = 0;
+    void Update()
+    {
+        attackCombo = GetComponentInParent<gameplay>().attackCombo;
+    }
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Enemy"))
         {
-            Debug.Log("Hit enemy!");
-            other.GetComponent<Orc>().TakeDamage(1);
+            if (attackCombo == 1)
+            {
+                other.GetComponent<Orc>().TakeDamage(1);
+            }
+            else if (attackCombo == 2)
+            {
+                other.GetComponent<Orc>().TakeDamage(2);
+            }
         }
     }
 }
