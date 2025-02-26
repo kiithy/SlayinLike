@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     private int score;
     private int health;
     public AudioSource backgroundMusic;
+    public AudioClip gameOverMusic;
     void Awake()
     {
         if (Instance == null)
@@ -80,6 +81,11 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0.0f;
         gameOver.Invoke();
         backgroundMusic.Stop();
+        if (gameOverMusic != null)
+        {
+            backgroundMusic.PlayOneShot(gameOverMusic);
+        }
+
     }
 
     public void SetHealth(int health)

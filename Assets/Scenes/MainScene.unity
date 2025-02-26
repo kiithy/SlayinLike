@@ -2788,6 +2788,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   backgroundMusic: {fileID: 1114418602}
+  gameOverMusic: {fileID: 8300000, guid: 2e160568dc4604ca8b0377ead63a16e0, type: 3}
 --- !u!4 &2115087493
 Transform:
   m_ObjectHideFlags: 0
