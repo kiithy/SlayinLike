@@ -16,6 +16,10 @@ public class Orc : MonoBehaviour
 
     private bool isDamaged = false;
 
+    public AudioSource orcAudioSource;
+    public AudioClip orcAttackSound;
+    public AudioClip orcDeathSound;
+
     public CapsuleCollider2D orcCollider;  // Parent's collider for attacks
 
     private bool playerInRange = false;
@@ -159,5 +163,15 @@ public class Orc : MonoBehaviour
         {
             StartCoroutine(knight.Damaged());
         }
+    }
+
+    public void PlayAttackSound()
+    {
+        orcAudioSource.PlayOneShot(orcAttackSound);
+    }
+
+    public void PlayDeathSound()
+    {
+        orcAudioSource.PlayOneShot(orcDeathSound);
     }
 }
