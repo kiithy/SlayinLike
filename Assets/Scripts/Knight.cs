@@ -22,7 +22,7 @@ public class gameplay : MonoBehaviour
     private bool alive = true;
     private bool moving = false;
     private bool damaged = false;
-    private bool invincible = false;
+    public bool invincible = false;
     private int attackCombo = 0;
     private float comboTimer = 0;
     private float comboTimeWindow = 0.5f;
@@ -199,21 +199,11 @@ public class gameplay : MonoBehaviour
 
     }
 
-    void OnTriggerEnter2D(Collider2D collider)
+    public IEnumerator Damaged()
     {
-        if (collider.gameObject.CompareTag("Enemy") && !invincible)
-        {
-            // SECTION - Knight is damaged
-            invincible = true;
-            Debug.Log("Knight is damaged");
-            damaged = true;
-            knightAnimator.SetBool("Damaged", damaged);
-            StartCoroutine(Damaged());
-        }
-    }
-
-    IEnumerator Damaged()
-    {
+        invincible = true;
+        damaged = true;
+        knightAnimator.SetBool("Damaged", damaged);
         yield return new WaitForSeconds(2);
         damaged = false;
         knightAnimator.SetBool("Damaged", damaged);

@@ -5,6 +5,7 @@ public class Orc : MonoBehaviour
 {
     [Header("References")]
     public Transform player;
+    public gameplay knight;
     private Rigidbody2D rb;
     private Animator animator; // Reference to the animator
 
@@ -15,16 +16,15 @@ public class Orc : MonoBehaviour
 
     private bool isDamaged = false;
 
-    private CapsuleCollider2D orcCollider;
+    public CapsuleCollider2D orcCollider;  // Parent's collider for attacks
 
-    private void Awake()
-    {
-        orcCollider = GetComponent<CapsuleCollider2D>();
-    }
+    private bool playerInRange = false;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        orcCollider = GetComponent<CapsuleCollider2D>();
 
         // Find player if not assigned
         if (player == null)
@@ -57,12 +57,13 @@ public class Orc : MonoBehaviour
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
         // If in attack range and not already attacking
-        if (distanceToPlayer <= attackRange && !isAttacking)
+        if ((distanceToPlayer <= attackRange) && !isAttacking)
         {
             StartAttack();
         }
+
         // If not attacking, continue moving
-        else if (!isAttacking)
+        if (!isAttacking)
         {
             MoveTowardsPlayer();
         }
@@ -85,7 +86,7 @@ public class Orc : MonoBehaviour
         );
     }
 
-    private void StartAttack()
+    public void StartAttack()
     {
         isAttacking = true;
         rb.velocity = Vector2.zero; // Stop moving
@@ -132,5 +133,31 @@ public class Orc : MonoBehaviour
     {
         isDamaged = false;
         animator.SetBool("IsWalking", true);
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = true;
+            knight = other.GetComponent<gameplay>();
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = false;
+        }
+    }
+
+    // Called by Animation Event during attack animation
+    public void StartDamageCoroutine()
+    {
+        if (knight != null && playerInRange && !knight.invincible)
+        {
+            StartCoroutine(knight.Damaged());
+        }
     }
 }
