@@ -23,7 +23,9 @@ public class Orc : MonoBehaviour
     public CapsuleCollider2D orcCollider;  // Parent's collider for attacks
 
     private bool playerInRange = false;
-    private int health = 3;
+
+    public GameManager gameManager;
+    private int health = 10;
 
     private void Start()
     {
@@ -117,18 +119,28 @@ public class Orc : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        if (isDamaged)
+        {
+            return;
+        }
         Debug.Log($"Orc took {damage} damage!");
         isDamaged = true;
         isAttacking = false;
         animator.SetBool("IsAttacking", false);
         animator.SetBool("IsWalking", false);
 
-        // Check if orc dies (add health system)
+        health -= damage;
+
+        // Increment score on every hit
+        gameManager.IncreaseScore(5);  // 5 points per hit
+
+        // Check if orc dies
         if (health <= 0)
         {
-            GameManager.Instance.IncreaseScore(10);  // Award points
+            gameManager.IncreaseScore(10);  // Bonus points for kill
             PlayDeathSound();
-            Destroy(gameObject);
+            animator.SetTrigger("Kill");
+            StartCoroutine(DestroyOrcBody());
         }
         else
         {
@@ -137,12 +149,11 @@ public class Orc : MonoBehaviour
         }
     }
 
-    // private IEnumerator PlayHurtAnimation()
-    // {
-    //     animator.SetTrigger("Damaged");
-    //     yield return new WaitForSeconds(2f);
-    //     ResetAfterDamage();
-    // }
+    private IEnumerator DestroyOrcBody()
+    {
+        yield return new WaitForSeconds(2f);
+        Destroy(gameObject);
+    }
 
     // Now called by coroutine instead of animation event
     public void ResetAfterDamage()
@@ -173,6 +184,7 @@ public class Orc : MonoBehaviour
     {
         if (knight != null && playerInRange && !knight.invincible)
         {
+            knight.DecreaseHealth(1);  // Use the knight's method which handles GameManager
             StartCoroutine(knight.Damaged());
         }
     }

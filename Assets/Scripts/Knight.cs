@@ -26,6 +26,7 @@ public class gameplay : MonoBehaviour
     public int attackCombo = 0;
     private float comboTimer = 0;
     private float comboTimeWindow = 0.5f;
+    public int health = 5;
     public GameObject swordHitbox;
     private Collider2D swordCollider;
     private CapsuleCollider2D knightCollider;
@@ -181,7 +182,6 @@ public class gameplay : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        knightAnimator.SetFloat("xSpeed", Mathf.Abs(knightBody.velocity.x));
         UpdateComboTimer();
     }
 
@@ -233,6 +233,13 @@ public class gameplay : MonoBehaviour
         knightAudioSource.PlayOneShot(knightAttack2Sound);
     }
 
-
-
+    public void DecreaseHealth(int decrement)
+    {
+        health -= decrement;
+        GameManager.Instance.SetHealth(health);
+        if (health <= 0)
+        {
+            GameManager.Instance.GameOver();
+        }
+    }
 }

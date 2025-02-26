@@ -13,10 +13,12 @@ public class KnightHitBox : MonoBehaviour
         {
             if (attackCombo == 1)
             {
+                // deals two damage
                 other.GetComponent<Orc>().TakeDamage(1);
             }
             else if (attackCombo == 2)
             {
+                // deals four damage
                 other.GetComponent<Orc>().TakeDamage(2);
             }
         }
