@@ -23,6 +23,7 @@ public class Orc : MonoBehaviour
     public CapsuleCollider2D orcCollider;  // Parent's collider for attacks
 
     private bool playerInRange = false;
+    private int health = 3;
 
     private void Start()
     {
@@ -122,11 +123,18 @@ public class Orc : MonoBehaviour
         animator.SetBool("IsAttacking", false);
         animator.SetBool("IsWalking", false);
 
-        // Set the hurt animation to play for 2 seconds
-        // StartCoroutine(PlayHurtAnimation());
-
-        animator.SetTrigger("Damaged");
-        ResetAfterDamage();
+        // Check if orc dies (add health system)
+        if (health <= 0)
+        {
+            GameManager.Instance.IncreaseScore(10);  // Award points
+            PlayDeathSound();
+            Destroy(gameObject);
+        }
+        else
+        {
+            animator.SetTrigger("Damaged");
+            ResetAfterDamage();
+        }
     }
 
     // private IEnumerator PlayHurtAnimation()

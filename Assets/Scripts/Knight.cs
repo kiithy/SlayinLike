@@ -209,6 +209,7 @@ public class gameplay : MonoBehaviour
         invincible = true;
         damaged = true;
         knightAnimator.SetBool("Damaged", damaged);
+        // GameManager.Instance.GameOver();
         yield return new WaitForSeconds(2);
         damaged = false;
         knightAnimator.SetBool("Damaged", damaged);
