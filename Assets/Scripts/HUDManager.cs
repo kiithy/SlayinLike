@@ -11,6 +11,7 @@ public class HUDManager : MonoBehaviour
     public GameObject scoreText;
     public GameObject healthText;
     public GameObject gameWinPanel;
+    public GameObject highScoreText;
     void Awake()
     {
         if (instance == null)
@@ -41,6 +42,7 @@ public class HUDManager : MonoBehaviour
         GameManager.instance.gameOver.AddListener(ShowGameOver);
         GameManager.instance.gameStart.AddListener(GameStart);
         GameManager.instance.gameRestart.AddListener(HideGameOver);
+        GameManager.instance.highScoreChange.AddListener(SetHighScore);
     }
 
     // Start is called before the first frame update
@@ -74,7 +76,7 @@ public class HUDManager : MonoBehaviour
     }
 
     public void GameWin()
-    { 
+    {
         if (gameWinPanel != null)
             gameWinPanel.SetActive(true);
     }
@@ -96,7 +98,14 @@ public class HUDManager : MonoBehaviour
         if (GameManager.instance != null)
         {
             GameManager.instance.GameRestart();
+            SetHighScore(GameManager.instance.gameConstants.highScore);
         }
+    }
+
+    public void SetHighScore(int highScore)
+    {
+        if (highScoreText != null)
+            highScoreText.GetComponent<TextMeshProUGUI>().text = "High Score: " + highScore.ToString();
     }
 }
 

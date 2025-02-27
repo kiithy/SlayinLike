@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     public UnityEvent<int> scoreChange;
     public UnityEvent gameOver;
     public UnityEvent<int> healthChange;
+    public UnityEvent<int> highScoreChange;
     private int score;
     private int health;
     public AudioSource backgroundMusic;
@@ -25,6 +26,7 @@ public class GameManager : MonoBehaviour
     private int totalOrcs;
     private int orcsDefeated;
     public UnityEvent gameWin;
+    public GameConstants gameConstants;
 
     void Awake()
     {
@@ -72,6 +74,7 @@ public class GameManager : MonoBehaviour
             gameStart.RemoveAllListeners();
             gameRestart.RemoveAllListeners();
             gameWin.RemoveAllListeners();
+            highScoreChange.RemoveAllListeners();
 
             scoreChange.AddListener(hudManager.SetScore);
             healthChange.AddListener(hudManager.SetHealth);
@@ -79,6 +82,7 @@ public class GameManager : MonoBehaviour
             gameStart.AddListener(hudManager.GameStart);
             gameRestart.AddListener(hudManager.HideGameOver);
             gameWin.AddListener(hudManager.GameWin);
+            highScoreChange.AddListener(hudManager.SetHighScore);
             SetScore(score);
             SetHealth(health);
         }
@@ -113,6 +117,11 @@ public class GameManager : MonoBehaviour
 
     public void GameRestart()
     {
+        if (score > gameConstants.highScore)
+        {
+            gameConstants.highScore = score;
+            highScoreChange.Invoke(score);
+        }
         score = 0;
         SetScore(score);
         health = maxPlayerHealth;
@@ -172,7 +181,10 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0.0f;
         gameWin.Invoke();
         backgroundMusic.Stop();
-
-
+        if (score > gameConstants.highScore)
+        {
+            gameConstants.highScore = score;
+            highScoreChange.Invoke(score);
+        }
     }
 }
