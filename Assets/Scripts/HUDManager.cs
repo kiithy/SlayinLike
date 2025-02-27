@@ -2,30 +2,55 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class HUDManager : MonoBehaviour
 {
+    public static HUDManager instance;
     public GameObject gameOverPanel;
     public GameObject scoreText;
-    public GameManager gameManager;
     public GameObject healthText;
+    private Canvas canvas;
+
+    void Awake()
+    {
+        // Get the parent Canvas
+        canvas = GetComponent<Canvas>();
+
+        if (instance == null)
+        {
+            instance = this;
+            // Keep the entire UI hierarchy
+            DontDestroyOnLoad(canvas.gameObject);
+            if (gameOverPanel != null)
+            {
+                gameOverPanel.SetActive(false);
+            }
+            ConnectToGameManager();
+        }
+        else
+        {
+            // If another HUDManager exists, destroy this entire Canvas
+            Destroy(canvas.gameObject);
+        }
+    }
+
+    void ConnectToGameManager()
+    {
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.scoreChange.AddListener(SetScore);
+            GameManager.instance.healthChange.AddListener(SetHealth);
+            GameManager.instance.gameOver.AddListener(ShowGameOver);
+            GameManager.instance.gameStart.AddListener(GameStart);
+            GameManager.instance.gameRestart.AddListener(HideGameOver);
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        // Subscribe to GameManager events
-        if (gameManager != null)
-        {
-            gameManager.scoreChange.AddListener(SetScore);
-            gameManager.gameOver.AddListener(ShowGameOver);
-            gameManager.gameStart.AddListener(GameStart);
-            gameManager.gameRestart.AddListener(HideGameOver);
-            gameManager.healthChange.AddListener(SetHealth);
-        }
-        else
-        {
-            Debug.LogWarning("GameManager reference not set in HUDManager!");
-        }
+
     }
 
     // Update is called once per frame

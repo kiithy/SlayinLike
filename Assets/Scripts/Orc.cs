@@ -40,6 +40,9 @@ public class Orc : MonoBehaviour
             player = GameObject.FindGameObjectWithTag("Player")?.transform;
             Debug.Log($"Found player at position: {player?.position}");
         }
+
+        // Find the persistent GameManager
+        gameManager = GameManager.instance;
     }
 
     private void Update()

@@ -36,6 +36,8 @@ public class gameplay : MonoBehaviour
     public AudioClip knightAttack2Sound;
     public AudioClip knightDeathSound;
 
+    private GameManager gameManager;
+
     private void Awake()
     {
         controls = new KnightActions();
@@ -177,7 +179,8 @@ public class gameplay : MonoBehaviour
         knightSprite = GetComponent<SpriteRenderer>();
         knightAnimator.SetBool("OnGroundState", onGroundState);
         knightCollider = GetComponent<CapsuleCollider2D>();
-        health = GameManager.Instance.maxPlayerHealth;
+        gameManager = FindObjectOfType<GameManager>();
+        health = gameManager.maxPlayerHealth;
     }
 
     // Update is called once per frame
@@ -237,10 +240,10 @@ public class gameplay : MonoBehaviour
     public void DecreaseHealth(int decrement)
     {
         health -= decrement;
-        GameManager.Instance.SetHealth(health);
+        gameManager.SetHealth(health);
         if (health <= 0)
         {
-            GameManager.Instance.GameOver();
+            gameManager.GameOver();
             return;
         }
     }
