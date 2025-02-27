@@ -4,45 +4,20 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
-public class HUDManager : MonoBehaviour
+public class HUDManager : Singleton<HUDManager>
 {
-    private static HUDManager instance;
     public GameObject gameOverPanel;
     public GameObject scoreText;
     public GameObject healthText;
     public GameObject gameWinPanel;
     public GameObject highScoreText;
-    void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-            if (gameOverPanel != null)
-            {
-                gameOverPanel.SetActive(false);
-            }
 
-            if (gameWinPanel != null)
-            {
-                gameWinPanel.SetActive(false);
-            }
-            ConnectToGameManager();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    void ConnectToGameManager()
+    protected override void OnAwake()
     {
-        GameManager.instance.scoreChange.AddListener(SetScore);
-        GameManager.instance.healthChange.AddListener(SetHealth);
-        GameManager.instance.gameOver.AddListener(ShowGameOver);
-        GameManager.instance.gameStart.AddListener(GameStart);
-        GameManager.instance.gameRestart.AddListener(HideGameOver);
-        GameManager.instance.highScoreChange.AddListener(SetHighScore);
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
+        if (gameWinPanel != null)
+            gameWinPanel.SetActive(false);
     }
 
     // Start is called before the first frame update
@@ -95,11 +70,7 @@ public class HUDManager : MonoBehaviour
 
     public void OnRestartButtonClick()
     {
-        if (GameManager.instance != null)
-        {
-            GameManager.instance.GameRestart();
-            SetHighScore(GameManager.instance.gameConstants.highScore);
-        }
+        GameManager.Instance.GameRestart();
     }
 
     public void SetHighScore(int highScore)

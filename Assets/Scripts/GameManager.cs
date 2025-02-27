@@ -6,75 +6,45 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : Singleton<GameManager>
 {
-    public static GameManager instance { get; private set; }
-
     [Header("Player Stats")]
     public int maxPlayerHealth = 3;
-
-    // events
-    public UnityEvent gameStart;
-    public UnityEvent gameRestart;
-    public UnityEvent<int> scoreChange;
-    public UnityEvent gameOver;
-    public UnityEvent<int> healthChange;
-    public UnityEvent<int> highScoreChange;
     private int score;
     private int health;
+
     [Header("Audio")]
     public AudioSource backgroundMusic;
     public AudioClip gameOverMusic;
+    public AudioClip gameWinMusic;
     public AudioClip mainSceneMusic;
     public AudioClip secondSceneMusic;
-    private HUDManager hudManager;  // Changed from Canvas to HUDManager
+
     private int totalOrcs;
     private int orcsDefeated;
-    public UnityEvent gameWin;
-    public GameConstants gameConstants;
+    [Header("Game Data")]
+    [SerializeField] public GameConstants gameConstants;  // Assign in Inspector
 
-    override public void Awake()
+    protected override void OnAwake()
     {
-        base.Awake();
-        if (instance == null)
-        {
-            instance = this;
-            // Find and keep the HUDManager
-            hudManager = FindObjectOfType<HUDManager>();
-            if (hudManager != null)
-            {
-                DontDestroyOnLoad(hudManager.gameObject);  // This will keep the Canvas since it's the same object
-            }
-            DontDestroyOnLoad(gameObject);
+        health = gameConstants != null && gameConstants.playerHealth > 0
+            ? gameConstants.playerHealth
+            : maxPlayerHealth;
 
-            // Get or create AudioSource
-            backgroundMusic = GetComponent<AudioSource>();
-            if (backgroundMusic == null)
-            {
-                backgroundMusic = gameObject.AddComponent<AudioSource>();
-                backgroundMusic.loop = true;
-                backgroundMusic.playOnAwake = false;
-            }
-        }
-        else
+        // Setup audio
+        backgroundMusic = GetComponent<AudioSource>();
+        if (backgroundMusic == null)
         {
-            Destroy(gameObject);
+            backgroundMusic = gameObject.AddComponent<AudioSource>();
+            backgroundMusic.loop = true;
+            backgroundMusic.playOnAwake = false;
         }
-    }
 
-    void OnEnable()
-    {
         SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "SecondScene")
         {
-            // Keep existing health when moving to second scene
             health = gameConstants.playerHealth;
             totalOrcs = FindObjectsOfType<Orc>().Length;
             orcsDefeated = 0;
@@ -86,7 +56,6 @@ public class GameManager : Singleton<GameManager>
         }
         else if (scene.name == "MainScene")
         {
-            // Only reset health if coming from game start or restart
             if (gameConstants.playerHealth <= 0)
             {
                 health = maxPlayerHealth;
@@ -99,87 +68,33 @@ public class GameManager : Singleton<GameManager>
             }
         }
 
-        if (hudManager != null)
-        {
-            scoreChange.RemoveAllListeners();
-            healthChange.RemoveAllListeners();
-            gameOver.RemoveAllListeners();
-            gameStart.RemoveAllListeners();
-            gameRestart.RemoveAllListeners();
-            gameWin.RemoveAllListeners();
-            highScoreChange.RemoveAllListeners();
-
-            scoreChange.AddListener(hudManager.SetScore);
-            healthChange.AddListener(hudManager.SetHealth);
-            gameOver.AddListener(hudManager.ShowGameOver);
-            gameStart.AddListener(hudManager.GameStart);
-            gameRestart.AddListener(hudManager.HideGameOver);
-            gameWin.AddListener(hudManager.GameWin);
-            highScoreChange.AddListener(hudManager.SetHighScore);
-            SetScore(score);
-            SetHealth(health);
-        }
-        highScoreChange.Invoke(gameConstants.highScore);
+        UpdateUI();
     }
 
-    void Start()
+    private void UpdateUI()
     {
-        health = maxPlayerHealth;  // Use the configurable value
-        SetHealth(health);
-        gameStart.Invoke();
-        Time.timeScale = 1.0f;
+        HUDManager.Instance.SetScore(score);
+        HUDManager.Instance.SetHealth(health);
+        HUDManager.Instance.SetHighScore(gameConstants.highScore);
     }
 
-    public void DecreaseHealth(int decrement)
+    public void SetHealth(int newHealth)
     {
-        if (health - decrement <= 0)
-        {
-            health = 0;
-            SetHealth(health);
-            GameOver();
-            return;
-        }
-        health -= decrement;
-        SetHealth(health);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    public void GameRestart()
-    {
-        if (score > gameConstants.highScore)
-        {
-            gameConstants.highScore = score;
-            highScoreChange.Invoke(score);
-        }
-        score = 0;
-        SetScore(score);
-        health = maxPlayerHealth;
-        SetHealth(health);
-        gameRestart.Invoke();
-        Time.timeScale = 1.0f;
-        SceneManager.LoadScene("MainScene");
+        health = newHealth;
+        gameConstants.playerHealth = health;
+        HUDManager.Instance.SetHealth(health);
     }
 
     public void IncreaseScore(int increment)
     {
         score += increment;
-        SetScore(score);
-    }
-
-    public void SetScore(int score)
-    {
-        scoreChange.Invoke(score);
+        HUDManager.Instance.SetScore(score);
     }
 
     public void GameOver()
     {
         Time.timeScale = 0.0f;
-        gameOver.Invoke();
+        HUDManager.Instance.ShowGameOver();
         backgroundMusic.Stop();
         if (gameOverMusic != null)
         {
@@ -187,13 +102,37 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
-    public void SetHealth(int newHealth)
+    public void GameRestart()
     {
-        health = newHealth;
-        gameConstants.playerHealth = health;  // Store in persistent data
-        healthChange.Invoke(health);
+        if (score > gameConstants.highScore)
+        {
+            gameConstants.highScore = score;
+            HUDManager.Instance.SetHighScore(gameConstants.highScore);
+        }
+        score = 0;
+        health = maxPlayerHealth;
+        gameConstants.playerHealth = health;
+        UpdateUI();
+        HUDManager.Instance.HideGameOver();
+        Time.timeScale = 1.0f;
+        SceneManager.LoadScene("MainScene");
     }
 
+    public void GameWin()
+    {
+        Time.timeScale = 0.0f;
+        HUDManager.Instance.GameWin();
+        backgroundMusic.Stop();
+        if (gameWinMusic != null)
+        {
+            AudioSource.PlayClipAtPoint(gameWinMusic, Camera.main.transform.position);
+        }
+        if (score > gameConstants.highScore)
+        {
+            gameConstants.highScore = score;
+            HUDManager.Instance.SetHighScore(score);
+        }
+    }
 
     public void OrcDefeated()
     {
@@ -201,19 +140,6 @@ public class GameManager : Singleton<GameManager>
         if (SceneManager.GetActiveScene().name == "SecondScene" && orcsDefeated >= totalOrcs)
         {
             GameWin();
-        }
-    }
-
-    public void GameWin()
-    {
-        // Optional: Play victory music
-        Time.timeScale = 0.0f;
-        gameWin.Invoke();
-        backgroundMusic.Stop();
-        if (score > gameConstants.highScore)
-        {
-            gameConstants.highScore = score;
-            highScoreChange.Invoke(score);
         }
     }
 }
