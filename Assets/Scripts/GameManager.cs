@@ -74,11 +74,10 @@ public class GameManager : Singleton<GameManager>
     {
         if (scene.name == "SecondScene")
         {
-            // Count total orcs in the scene
+            // Keep existing health when moving to second scene
+            health = gameConstants.playerHealth;
             totalOrcs = FindObjectsOfType<Orc>().Length;
             orcsDefeated = 0;
-
-            // Change music for second scene
             if (secondSceneMusic != null)
             {
                 backgroundMusic.clip = secondSceneMusic;
@@ -87,7 +86,12 @@ public class GameManager : Singleton<GameManager>
         }
         else if (scene.name == "MainScene")
         {
-            // Change music for main scene
+            // Only reset health if coming from game start or restart
+            if (gameConstants.playerHealth <= 0)
+            {
+                health = maxPlayerHealth;
+                gameConstants.playerHealth = health;
+            }
             if (mainSceneMusic != null)
             {
                 backgroundMusic.clip = mainSceneMusic;
@@ -115,6 +119,7 @@ public class GameManager : Singleton<GameManager>
             SetScore(score);
             SetHealth(health);
         }
+        highScoreChange.Invoke(gameConstants.highScore);
     }
 
     void Start()
@@ -182,8 +187,10 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
-    public void SetHealth(int health)
+    public void SetHealth(int newHealth)
     {
+        health = newHealth;
+        gameConstants.playerHealth = health;  // Store in persistent data
         healthChange.Invoke(health);
     }
 

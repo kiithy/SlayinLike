@@ -34,25 +34,35 @@ public class Orc : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         orcCollider = GetComponent<CapsuleCollider2D>();
+        gameManager = GameManager.Instance;
+        FindPlayer();
+    }
 
-        // Find player if not assigned
+    private void FindPlayer()
+    {
         if (player == null)
         {
-            player = GameObject.FindGameObjectWithTag("Player")?.transform;
-            Debug.Log($"Found player at position: {player?.position}");
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                player = playerObj.transform;
+                knight = playerObj.GetComponent<gameplay>();
+            }
         }
-
-        // Find the persistent GameManager
-        gameManager = GameManager.instance;
     }
 
     private void Update()
     {
+        // Check if player reference is valid
+        if (player == null)
+        {
+            FindPlayer();
+            return;
+        }
 
         // Don't process attack/movement logic if damaged
         if (isDamaged)
         {
-            // Stop any current movement and attack
             rb.velocity = Vector2.zero;
             isAttacking = false;
             animator.SetBool("IsAttacking", false);

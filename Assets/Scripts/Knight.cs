@@ -180,14 +180,13 @@ public class gameplay : Singleton<gameplay>
     void Start()
     {
         knightBody = GetComponent<Rigidbody2D>();
-
         knightSprite = GetComponent<SpriteRenderer>();
         knightAnimator.SetBool("OnGroundState", onGroundState);
         knightCollider = GetComponent<CapsuleCollider2D>();
-        gameManager = FindObjectOfType<GameManager>();
-        health = gameManager.maxPlayerHealth;
+        gameManager = GameManager.Instance;
+        health = gameManager.gameConstants.playerHealth > 0 ?
+        gameManager.gameConstants.playerHealth : gameManager.maxPlayerHealth;
         startingPosition = transform.position;
-        // Subscribe to scene change
         SceneManager.activeSceneChanged += SetStartingPosition;
     }
 
