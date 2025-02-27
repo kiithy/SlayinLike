@@ -142,6 +142,7 @@ public class Orc : MonoBehaviour
         if (health <= 0)
         {
             gameManager.IncreaseScore(10);  // Bonus points for kill
+            gameManager.OrcDefeated();
             PlayDeathSound();
             animator.SetTrigger("Kill");
             StartCoroutine(DestroyOrcBody());

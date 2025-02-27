@@ -22,6 +22,9 @@ public class GameManager : MonoBehaviour
     public AudioSource backgroundMusic;
     public AudioClip gameOverMusic;
     private HUDManager hudManager;  // Changed from Canvas to HUDManager
+    private int totalOrcs;
+    private int orcsDefeated;
+    public UnityEvent gameWin;
 
     void Awake()
     {
@@ -54,6 +57,13 @@ public class GameManager : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        if (scene.name == "SecondScene")
+        {
+            // Count total orcs in the scene
+            totalOrcs = FindObjectsOfType<Orc>().Length;
+            orcsDefeated = 0;
+        }
+
         if (hudManager != null)
         {
             scoreChange.RemoveAllListeners();
@@ -61,13 +71,14 @@ public class GameManager : MonoBehaviour
             gameOver.RemoveAllListeners();
             gameStart.RemoveAllListeners();
             gameRestart.RemoveAllListeners();
+            gameWin.RemoveAllListeners();
 
             scoreChange.AddListener(hudManager.SetScore);
             healthChange.AddListener(hudManager.SetHealth);
             gameOver.AddListener(hudManager.ShowGameOver);
             gameStart.AddListener(hudManager.GameStart);
             gameRestart.AddListener(hudManager.HideGameOver);
-
+            gameWin.AddListener(hudManager.GameWin);
             SetScore(score);
             SetHealth(health);
         }
@@ -104,10 +115,11 @@ public class GameManager : MonoBehaviour
     {
         score = 0;
         SetScore(score);
-        health = maxPlayerHealth;  // Use the same configurable value
+        health = maxPlayerHealth;
         SetHealth(health);
         gameRestart.Invoke();
         Time.timeScale = 1.0f;
+        SceneManager.LoadScene("MainScene");
     }
 
     public void IncreaseScore(int increment)
@@ -126,9 +138,15 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0.0f;
         gameOver.Invoke();
         backgroundMusic.Stop();
+        AudioSource[] allAudioSources = FindObjectsOfType<AudioSource>();
+        foreach (AudioSource audioSource in allAudioSources)
+        {
+            audioSource.mute = true;
+        }
         if (gameOverMusic != null)
         {
-            backgroundMusic.PlayOneShot(gameOverMusic);
+            // backgroundMusic.PlayOneShot(gameOverMusic);
+            AudioSource.PlayClipAtPoint(gameOverMusic, Camera.main.transform.position);
         }
 
     }
@@ -136,5 +154,25 @@ public class GameManager : MonoBehaviour
     public void SetHealth(int health)
     {
         healthChange.Invoke(health);
+    }
+
+
+    public void OrcDefeated()
+    {
+        orcsDefeated++;
+        if (SceneManager.GetActiveScene().name == "SecondScene" && orcsDefeated >= totalOrcs)
+        {
+            GameWin();
+        }
+    }
+
+    public void GameWin()
+    {
+        // Optional: Play victory music
+        Time.timeScale = 0.0f;
+        gameWin.Invoke();
+        backgroundMusic.Stop();
+
+
     }
 }

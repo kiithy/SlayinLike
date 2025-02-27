@@ -6,45 +6,41 @@ using UnityEngine.UI;
 
 public class HUDManager : MonoBehaviour
 {
-    public static HUDManager instance;
+    private static HUDManager instance;
     public GameObject gameOverPanel;
     public GameObject scoreText;
     public GameObject healthText;
-    private Canvas canvas;
-
+    public GameObject gameWinPanel;
     void Awake()
     {
-        // Get the parent Canvas
-        canvas = GetComponent<Canvas>();
-
         if (instance == null)
         {
             instance = this;
-            // Keep the entire UI hierarchy
-            DontDestroyOnLoad(canvas.gameObject);
+            DontDestroyOnLoad(gameObject);
             if (gameOverPanel != null)
             {
                 gameOverPanel.SetActive(false);
+            }
+
+            if (gameWinPanel != null)
+            {
+                gameWinPanel.SetActive(false);
             }
             ConnectToGameManager();
         }
         else
         {
-            // If another HUDManager exists, destroy this entire Canvas
-            Destroy(canvas.gameObject);
+            Destroy(gameObject);
         }
     }
 
     void ConnectToGameManager()
     {
-        if (GameManager.instance != null)
-        {
-            GameManager.instance.scoreChange.AddListener(SetScore);
-            GameManager.instance.healthChange.AddListener(SetHealth);
-            GameManager.instance.gameOver.AddListener(ShowGameOver);
-            GameManager.instance.gameStart.AddListener(GameStart);
-            GameManager.instance.gameRestart.AddListener(HideGameOver);
-        }
+        GameManager.instance.scoreChange.AddListener(SetScore);
+        GameManager.instance.healthChange.AddListener(SetHealth);
+        GameManager.instance.gameOver.AddListener(ShowGameOver);
+        GameManager.instance.gameStart.AddListener(GameStart);
+        GameManager.instance.gameRestart.AddListener(HideGameOver);
     }
 
     // Start is called before the first frame update
@@ -77,6 +73,12 @@ public class HUDManager : MonoBehaviour
             gameOverPanel.SetActive(true);
     }
 
+    public void GameWin()
+    { 
+        if (gameWinPanel != null)
+            gameWinPanel.SetActive(true);
+    }
+
     public void HideGameOver()
     {
         if (gameOverPanel != null)
@@ -87,6 +89,14 @@ public class HUDManager : MonoBehaviour
     {
         if (healthText != null)
             healthText.GetComponent<TextMeshProUGUI>().text = "Health: " + health.ToString();
+    }
+
+    public void OnRestartButtonClick()
+    {
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.GameRestart();
+        }
     }
 }
 
