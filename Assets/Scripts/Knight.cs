@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
 
-public class gameplay : MonoBehaviour
+public class gameplay : Singleton<gameplay>
 {
     private KnightActions controls;
     private Vector2 moveInput;
@@ -37,9 +40,11 @@ public class gameplay : MonoBehaviour
     public AudioClip knightDeathSound;
 
     private GameManager gameManager;
+    private Vector3 startingPosition;
 
     private void Awake()
     {
+        base.Awake();
         controls = new KnightActions();
         swordCollider = swordHitbox.GetComponent<Collider2D>();
         swordCollider.enabled = false;
@@ -181,6 +186,17 @@ public class gameplay : MonoBehaviour
         knightCollider = GetComponent<CapsuleCollider2D>();
         gameManager = FindObjectOfType<GameManager>();
         health = gameManager.maxPlayerHealth;
+        startingPosition = transform.position;
+        // Subscribe to scene change
+        SceneManager.activeSceneChanged += SetStartingPosition;
+    }
+
+    void SetStartingPosition(Scene current, Scene next)
+    {
+        if (next.name == "SecondScene")
+        {
+            this.transform.position = startingPosition;
+        }
     }
 
     // Update is called once per frame
@@ -208,13 +224,16 @@ public class gameplay : MonoBehaviour
 
     }
 
-    public IEnumerator Damaged()
+    public async Task Damaged()
     {
+        if (invincible) return;
+
         invincible = true;
         damaged = true;
         knightAnimator.SetBool("Damaged", damaged);
-        // GameManager.Instance.GameOver();
-        yield return new WaitForSeconds(2);
+
+        await Task.Delay(2000); // 2000ms = 2 seconds
+
         damaged = false;
         knightAnimator.SetBool("Damaged", damaged);
         invincible = false;
@@ -237,14 +256,15 @@ public class gameplay : MonoBehaviour
         knightAudioSource.PlayOneShot(knightAttack2Sound);
     }
 
-    public void DecreaseHealth(int decrement)
+    public async void TakeDamage(int damage)
     {
-        health -= decrement;
-        gameManager.SetHealth(health);
+        health -= damage;
+        GameManager.Instance.SetHealth(health);
         if (health <= 0)
         {
-            gameManager.GameOver();
+            GameManager.Instance.GameOver();
             return;
         }
+        await Damaged();
     }
 }

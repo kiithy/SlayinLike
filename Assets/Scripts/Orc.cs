@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Threading.Tasks;
 
 public class Orc : MonoBehaviour
 {
@@ -47,11 +48,6 @@ public class Orc : MonoBehaviour
 
     private void Update()
     {
-        if (player == null)
-        {
-            Debug.LogWarning("No player reference!");
-            return;
-        }
 
         // Don't process attack/movement logic if damaged
         if (isDamaged)
@@ -121,7 +117,7 @@ public class Orc : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 
-    public void TakeDamage(int damage)
+    public async Task TakeDamage(int damage)
     {
         if (isDamaged)
         {
@@ -173,12 +169,12 @@ public class Orc : MonoBehaviour
     }
 
     // Now called by coroutine instead of animation event
-    public void ResetAfterDamage()
+    public async Task ResetAfterDamage()
     {
+        await Task.Delay(1000); // 1 second damage state
         isDamaged = false;
         animator.SetBool("IsWalking", true);
     }
-
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
@@ -197,12 +193,13 @@ public class Orc : MonoBehaviour
     }
 
     // Called by Animation Event during attack animation
-    public void StartDamageCoroutine()
+
+    public async void StartDamageCoroutine()
     {
         if (knight != null && playerInRange && !knight.invincible)
         {
-            knight.DecreaseHealth(1);  // Use the knight's method which handles GameManager
-            StartCoroutine(knight.Damaged());
+            knight.TakeDamage(1);
+            await knight.Damaged();
         }
     }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
     public static GameManager instance { get; private set; }
 
@@ -20,16 +20,20 @@ public class GameManager : MonoBehaviour
     public UnityEvent<int> highScoreChange;
     private int score;
     private int health;
+    [Header("Audio")]
     public AudioSource backgroundMusic;
     public AudioClip gameOverMusic;
+    public AudioClip mainSceneMusic;
+    public AudioClip secondSceneMusic;
     private HUDManager hudManager;  // Changed from Canvas to HUDManager
     private int totalOrcs;
     private int orcsDefeated;
     public UnityEvent gameWin;
     public GameConstants gameConstants;
 
-    void Awake()
+    override public void Awake()
     {
+        base.Awake();
         if (instance == null)
         {
             instance = this;
@@ -40,6 +44,15 @@ public class GameManager : MonoBehaviour
                 DontDestroyOnLoad(hudManager.gameObject);  // This will keep the Canvas since it's the same object
             }
             DontDestroyOnLoad(gameObject);
+
+            // Get or create AudioSource
+            backgroundMusic = GetComponent<AudioSource>();
+            if (backgroundMusic == null)
+            {
+                backgroundMusic = gameObject.AddComponent<AudioSource>();
+                backgroundMusic.loop = true;
+                backgroundMusic.playOnAwake = false;
+            }
         }
         else
         {
@@ -64,6 +77,22 @@ public class GameManager : MonoBehaviour
             // Count total orcs in the scene
             totalOrcs = FindObjectsOfType<Orc>().Length;
             orcsDefeated = 0;
+
+            // Change music for second scene
+            if (secondSceneMusic != null)
+            {
+                backgroundMusic.clip = secondSceneMusic;
+                backgroundMusic.Play();
+            }
+        }
+        else if (scene.name == "MainScene")
+        {
+            // Change music for main scene
+            if (mainSceneMusic != null)
+            {
+                backgroundMusic.clip = mainSceneMusic;
+                backgroundMusic.Play();
+            }
         }
 
         if (hudManager != null)
@@ -147,17 +176,10 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0.0f;
         gameOver.Invoke();
         backgroundMusic.Stop();
-        AudioSource[] allAudioSources = FindObjectsOfType<AudioSource>();
-        foreach (AudioSource audioSource in allAudioSources)
-        {
-            audioSource.mute = true;
-        }
         if (gameOverMusic != null)
         {
-            // backgroundMusic.PlayOneShot(gameOverMusic);
             AudioSource.PlayClipAtPoint(gameOverMusic, Camera.main.transform.position);
         }
-
     }
 
     public void SetHealth(int health)
